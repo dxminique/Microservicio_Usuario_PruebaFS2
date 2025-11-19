@@ -22,10 +22,11 @@ public class AuthService {
         Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        if (!usuario.getPassword().equals(request.getPassword())) {
-            throw new RuntimeException("Credenciales incorrectas");
-        }
+        // 🔴 Por ahora, SIN validar password
 
-        return jwtUtil.generateToken(usuario.getEmail());
+        return jwtUtil.generateToken(
+                usuario.getEmail(),
+                usuario.getRol()
+        );
     }
 }
