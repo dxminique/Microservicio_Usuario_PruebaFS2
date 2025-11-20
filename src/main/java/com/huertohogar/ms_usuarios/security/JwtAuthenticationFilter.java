@@ -31,6 +31,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
+        // NO validar JWT en las rutas de autenticación
+        String path = request.getServletPath();
+        if (path.startsWith("/auth")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // Lógica normal de JWT para el resto de rutas
         String header = request.getHeader("Authorization");
 
         if (header != null && header.startsWith("Bearer ")) {
