@@ -3,7 +3,6 @@ package com.huertohogar.ms_usuarios.config;
 import com.huertohogar.ms_usuarios.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -14,43 +13,30 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtFilter) {
-        this.jwtFilter = jwtFilter;
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionManagement(sess ->
+                        sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-
-                        .requestMatchers("/auth/login").permitAll()
-                        .requestMatchers("/api/usuarios/ping").permitAll()
-
-
-
-                        .requestMatchers(HttpMethod.GET, "/api/usuarios/**")
-                        .hasAnyRole("USER", "ADMIN")
-
-                        // crear / actualizar / eliminar → solo ADMIN
-                        .requestMatchers(HttpMethod.POST, "/api/usuarios/**")
-                        .hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/usuarios/**")
-                        .hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/usuarios/**")
-                        .hasRole("ADMIN")
-
-                        // cualquier otra ruta → autenticada
+                        // login sin token
+                        .requestMatchers("/auth/**").permitAll()
+                        // CRUD SOLO ADMIN
+                        .requestMatchers("/api/usuarios/**").hasAuthority("ADMIN")
+                        // lo demás: autenticado
                         .anyRequest().authenticated()
                 );
 
-        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
