@@ -21,17 +21,16 @@ public class JwtUtil {
     @Value("${jwt.expiration}")
     private long expirationMs;
 
-
     public String generateToken(String email, String rol) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationMs);
 
         Map<String, Object> claims = new HashMap<>();
-        claims.put("rol", rol); // aquí guardamos el rol
+        claims.put("rol", rol);
 
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(email) // subject = email
+                .setSubject(email)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(
@@ -41,7 +40,6 @@ public class JwtUtil {
                 .compact();
     }
 
-
     private Claims getClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
@@ -50,16 +48,13 @@ public class JwtUtil {
                 .getBody();
     }
 
-
     public String getEmailFromToken(String token) {
         return getClaims(token).getSubject();
     }
 
-
     public String getRolFromToken(String token) {
         return getClaims(token).get("rol", String.class);
     }
-
 
     public boolean isTokenValid(String token) {
         Date expiration = getClaims(token).getExpiration();

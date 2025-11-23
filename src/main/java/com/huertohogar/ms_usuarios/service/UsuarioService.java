@@ -29,13 +29,15 @@ public class UsuarioService {
 
     public Usuario update(Long id, Usuario datos) {
         Usuario existente = getById(id);
+
         existente.setNombre(datos.getNombre());
         existente.setEmail(datos.getEmail());
         existente.setPassword(datos.getPassword());
         existente.setRol(datos.getRol());
-        existente.setActivo(datos.getActivo());
+        existente.setActivo(datos.isActivo());
         return usuarioRepository.save(existente);
     }
+
 
     public void delete(Long id) {
         Usuario existente = getById(id);

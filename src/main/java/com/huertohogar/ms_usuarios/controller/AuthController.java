@@ -24,15 +24,25 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+
+        Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
         String token = authService.login(request);
-        return ResponseEntity.ok(new LoginResponse(token));
+
+        LoginResponse response = new LoginResponse(
+                token,
+                usuario.getEmail(),
+                usuario.getRol()
+        );
+
+        return ResponseEntity.ok(response);
     }
 
 
     @PostMapping("/registro")
     public ResponseEntity<Usuario> registrar(@RequestBody RegistroRequest request) {
 
-        // validar que no exista el correo
         if (usuarioRepository.findByEmail(request.getEmail()).isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -40,7 +50,7 @@ public class AuthController {
         Usuario nuevo = new Usuario();
         nuevo.setNombre(request.getNombre());
         nuevo.setEmail(request.getEmail());
-        nuevo.setPassword(request.getPassword());
+        nuevo.setPassword(request.getPassword()); // texto plano
         nuevo.setRol("USER");
         nuevo.setActivo(true);
 
