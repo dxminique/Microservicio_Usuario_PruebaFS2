@@ -17,16 +17,16 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-
                         .requestMatchers("/auth/**").permitAll()
-
-
-                        .requestMatchers(HttpMethod.GET,  "/api/usuarios/**").hasRole("ADMIN")
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/usuarios/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/usuarios/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT,  "/api/usuarios/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE,"/api/usuarios/**").hasRole("ADMIN")
-
-
+                        .requestMatchers(HttpMethod.PUT, "/api/usuarios/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/usuarios/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form.disable())
