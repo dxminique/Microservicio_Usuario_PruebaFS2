@@ -15,22 +15,27 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(Customizer.withDefaults())
+                .cors(cors -> cors.disable())
                 .authorizeHttpRequests(auth -> auth
+                        // Login / registro, etc.
                         .requestMatchers("/auth/**").permitAll()
+
+                        // Swagger y OpenAPI
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/usuarios/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/usuarios/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/usuarios/**").hasRole("ADMIN")
+
+
+                        .requestMatchers(HttpMethod.GET,    "/api/usuarios/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST,   "/api/usuarios/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT,    "/api/usuarios/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/usuarios/**").hasRole("ADMIN")
+
+
                         .anyRequest().authenticated()
-                )
-                .formLogin(form -> form.disable())
-                .httpBasic(basic -> basic.disable());
+                );
 
         return http.build();
     }
